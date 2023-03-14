@@ -197,15 +197,14 @@ class MMC5603:
         self._ctrl0_reg = 0x10  # turn on reset bit
         time.sleep(0.001)  # 1 ms
 
-    def set_meas_reset_meas(self) -> None:
+    def set_meas_reset_meas(self) -> Tuple[float, float, float]:
         """Measure, set, measure, reset, for more precise measurements over a wider temperature"; removes bridge offset"""
         if not self.continuous_mode:
             self._ctrl0_reg = 0x08  # turn on set bit
             time.sleep(0.001)  # 1 ms
-            output1 = self.magnetic
+            mag = self.magnetic
             self._ctrl0_reg = 0x10  # turn on reset bit
             time.sleep(0.001)  # 1 ms
-            output2 = self.magnetic
-            for j in range(3):
-                    output1[j] = (output1[j] + output2[j]) / 2
-            return output1
+            mag += self.magnetic
+            mag /= 2
+            return mag
